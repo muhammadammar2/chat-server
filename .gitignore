@@ -1,0 +1,10 @@
+# Ignore build artifacts
+/bin/
+/obj/
+*.exe
+*.dll
+
+# IDE settings (optional, if you're using an IDE like Eclipse or VSCode)
+.vscode/
+.idea/
+
