@@ -63,3 +63,19 @@ void runServer (int server_socket) {
         }
     }
 }
+
+void handleClient(int client_socket) {
+    char room_name[100] , passcode[100] , username[100];
+
+    //ask client for creds
+    recv(client_socket , room_name , sizeof(room_name) , 0);
+    recv(client_socket , passcode , sizeof(passcode) , 0);
+
+    int room_id = joinOrCreateRoom(room_name , passcode);
+
+    recv(client_socket , username , sizeof(username) , 0);
+
+    addUserToRoom(room_id , client_socket , username);
+
+    handleMessage(client_socket , room_id);
+}
