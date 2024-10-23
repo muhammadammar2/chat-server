@@ -39,10 +39,6 @@ void handleClient(int client_socket) {
 
 }
 
-void kickUser(int room_id , int client_socket , const char* username) {
-
-}
-
 void cleanupClient(int client_socket){
     closesocket(client_socket);
     printf("Client socket closed.\n");

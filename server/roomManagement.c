@@ -28,6 +28,7 @@ int JoinOrCreateRoom(const char* room_name , const char* passcode) {
     strcpy(new_room->name , room_name);
     strcpy(new_room->passcode , passcode);
 
+    new_room->client_count = 0;
     new_room->clients = NULL;
     new_room->next = rooms;
     rooms = new_room;
@@ -106,6 +107,34 @@ Client* getClientsInRoom(int room_id) {
         room = room->next;
     }
     return NULL;
+}
+
+void kickUserFromRoom(int room_id, int admin_socket, int target_socket) {
+    Room* room = rooms;
+
+    while (room != NULL) {
+        if (room->id == room_id) {
+            // check if the admin is a part of the room
+            int is_admin = 0;
+            for (int i = 0; i < room->client_count; ++i) {
+                if (room->clients[i].socket == admin_socket) {
+                    is_admin = 1;
+                    break;
+                }
+            }
+
+            if (is_admin) {
+                removeUserFromRoom(room_id, target_socket);
+                printf("User kicked from room %s\n", room->name);
+                return;
+            } else {
+                printf("User is not admin in room %s\n", room->name);
+                return;
+            }
+        }
+        room = room->next;
+    }
+    printf("Room ID %d not found\n", room_id);
 }
 
 
