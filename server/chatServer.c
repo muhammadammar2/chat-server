@@ -70,7 +70,7 @@ void handleClientMessage(int client_socket, const char* message) {
     char command[256];
     scanf(message, "%s", command); 
 
-    if (strcmp(command, "Join") == 0) {
+    if (strcmp(command, "JOIN") == 0) {
         // handle join room
         char room_name[100], passcode[100];
         scanf(message + strlen(command) + 1, "%s %s", room_name, passcode);

@@ -26,6 +26,8 @@ void removeUserFromRoom(int room_id , int client_socket);
 
 Client* getClientsInRoom(int room_id);
 
+void kickUserFromRoom(int room_id , int admin_socket , int target_socket);
+
 void deleteRoom(int room_id);
 
 #endif
