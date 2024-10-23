@@ -11,6 +11,8 @@ typedef struct Room {
     int id;
     char name[100] , passcode[100];
     Client* clients;
+    // int client_count;
+    // int client_capacity;
     struct Room* next;
 } Room;
 
