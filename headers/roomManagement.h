@@ -14,11 +14,11 @@ typedef struct Room {
     struct Room* next;
 } Room;
 
-int joinOrCreateRoom(const char* room_name , const char* passcode);
+int JoinOrCreateRoom(const char* room_name , const char* passcode);
 
 void addUserToRoom(int room_id , int client_socket , const char* username);
 
-void removeUserFroomRoom(int room_id , int client_socket);
+void removeUserFromRoom(int room_id , int client_socket);
 
 Client* getClientsInRoom(int room_id);
 
