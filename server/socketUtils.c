@@ -16,7 +16,7 @@ int createSocket() {
         printf("WSAStartup failed: %d\n" , iResult);
         exit (EXIT_FAILURE);
     }
-   // for tcp connection
+   // create tcp socket
     int server_socket = socket(AF_INET , SOCK_STREAM , 0);
     if(server_socket == INVALID_SOCKET) {
         printf("Socket creation failed: %d\n" , WSAGetLastError());
