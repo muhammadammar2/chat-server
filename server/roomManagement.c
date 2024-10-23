@@ -85,3 +85,40 @@ void removeUserFromRoom(int room_id , int client_socket) {
     printf("Room ID %d not found\n" , room_id);
 }
 
+Client* getClientsInRoom(int room_id) {
+    Room* room = rooms;
+
+    //find room by ID
+    while(room != NULL) {
+        if(room->id == room_id) {
+            return room->clients;
+        }
+        room = room->next;
+    }
+    return NULL;
+}
+
+
+void deleteRoom (int room_id) {
+    Room ** current = &rooms;
+
+    while(*current != NULL) {
+        if((*current)->id == room_id) {
+            Room* to_free = *current;
+            *current = (*current)->next;
+
+            //free all the clients
+            Client* client = to_free->clients;
+            while(client != NULL) {
+                Client* to_free_client = client;
+                client = client->next;
+                free(to_free_client);
+            }
+            free(to_free);
+            printf("Room ID %d deleted\n" , room_id);
+            return;
+        }
+        current = &(*current) ->next;
+    }
+    printf("Room ID %d not found\n" , room_id);
+}
