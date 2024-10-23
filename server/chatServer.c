@@ -63,3 +63,28 @@ void runServer(int server_socket) {
     cleanupSocket(clients , client_count);
     free(clients);
 }
+
+void handleClient(int client_socket) {
+    char room_name[100] , passcode[100] , username[100];
+
+    //ask clients for creds
+    recv(client_socket , room_name , sizeof(room_name) , 0);
+    recv(client_socket , passcode , sizeof(passcode) , 0);
+
+    int room_id = joinOrCreateRoom(room_name , passcode);
+    if(room_id == -1) {
+        closesocket(client_socket);
+        return;
+    }
+
+    recv(client_socket , username , sizeof(username) , 0);
+    addUserToRoom(room_id , client_socket , username);
+
+    handleMessage(client_socket , room_id);
+}
+
+void cleanupClients(int* clients , int count) {
+    for(int i = 0; i < count; ++i) {
+        closesocket(clients[i]);
+    }
+}
