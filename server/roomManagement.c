@@ -57,3 +57,31 @@ void addUserToRoom(int room_id , int client_socket , const char* username) {
     }
     printf("Room Id %d not found\n" , room_id);
 }
+
+void removeUserFromRoom(int room_id , int client_socket) {
+    Room* room = rooms;
+
+    while(room != NULL) {
+        if(room->id == room_id) {
+            Client ** current = &room->clients;
+
+            //find client to remove
+            while(*current != NULL) {
+                if((*current)->socket == client_socket) {
+                    Client* to_free = *current;
+                    *current = (*current)->next;
+                    free(to_free);
+
+                    printf("User removed from room %s\n" , room->name);
+                    return;
+                }
+                current = &(*current)->next;
+            }
+            printf("Client not found in room %s\n" , room->name);
+            return;
+        }
+        room = room->next;
+    }
+    printf("Room ID %d not found\n" , room_id);
+}
+
