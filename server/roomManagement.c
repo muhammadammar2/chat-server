@@ -43,12 +43,14 @@ void addUserToRoom(int room_id , int client_socket , const char* username) {
     //find it by roomID
     while(room != NULL) {
         if(room->id == room_id) {
+            // resizing if necessary
+            room->clients = (Client*)realloc(room->clients, (room->client_count + 1) * sizeof(Client));
+
             // create a new client
             Client* new_client = (Client*) malloc(sizeof(Client));
-            new_client->socket = client_socket;
-            strcpy(new_client->username , username);
-            new_client->next = room->clients;
-            room->clients = new_client;
+              Client* new_client = &room->clients[room->client_count++];
+              new_client->socket = client_socket;
+              strcpy(new_client->username, username);
 
             printf("Added user %s to room %s\n" , username , room->name);
             return;
@@ -58,31 +60,39 @@ void addUserToRoom(int room_id , int client_socket , const char* username) {
     printf("Room Id %d not found\n" , room_id);
 }
 
-void removeUserFromRoom(int room_id , int client_socket) {
+
+void removeUserFromRoom(int room_id, int client_socket) {
     Room* room = rooms;
 
-    while(room != NULL) {
-        if(room->id == room_id) {
-            Client ** current = &room->clients;
+    while (room != NULL) {
+        if (room->id == room_id) {
+            int found_index = -1;
 
-            //find client to remove
-            while(*current != NULL) {
-                if((*current)->socket == client_socket) {
-                    Client* to_free = *current;
-                    *current = (*current)->next;
-                    free(to_free);
-
-                    printf("User removed from room %s\n" , room->name);
-                    return;
+            // find the client to remove
+            for (int i = 0; i < room->client_count; ++i) {
+                if (room->clients[i].socket == client_socket) {
+                    found_index = i;
+                    break;
                 }
-                current = &(*current)->next;
             }
-            printf("Client not found in room %s\n" , room->name);
-            return;
+
+            if (found_index != -1) {
+                // shift clients down in the dynamic array
+                for (int i = found_index; i < room->client_count - 1; ++i) {
+                    room->clients[i] = room->clients[i + 1];
+                }
+                room->client_count--; 
+                room->clients = (Client*)realloc(room->clients, room->client_count * sizeof(Client)); 
+                printf("User removed from room %s\n", room->name);
+                return;
+            } else {
+                printf("Client not found in room %s\n", room->name);
+                return;
+            }
         }
         room = room->next;
     }
-    printf("Room ID %d not found\n" , room_id);
+    printf("Room ID %d not found\n", room_id);
 }
 
 Client* getClientsInRoom(int room_id) {
@@ -99,26 +109,21 @@ Client* getClientsInRoom(int room_id) {
 }
 
 
-void deleteRoom (int room_id) {
-    Room ** current = &rooms;
+void deleteRoom(int room_id) {
+    Room** current = &rooms;
 
-    while(*current != NULL) {
-        if((*current)->id == room_id) {
+    while (*current != NULL) {
+        if ((*current)->id == room_id) {
             Room* to_free = *current;
             *current = (*current)->next;
 
-            //free all the clients
-            Client* client = to_free->clients;
-            while(client != NULL) {
-                Client* to_free_client = client;
-                client = client->next;
-                free(to_free_client);
-            }
+            // free all clients
+            free(to_free->clients);
             free(to_free);
-            printf("Room ID %d deleted\n" , room_id);
+            printf("Room ID %d deleted\n", room_id);
             return;
         }
-        current = &(*current) ->next;
+        current = &(*current)->next;
     }
-    printf("Room ID %d not found\n" , room_id);
+    printf("Room ID %d not found\n", room_id);
 }

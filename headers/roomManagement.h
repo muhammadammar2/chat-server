@@ -1,18 +1,20 @@
 #ifndef ROOM_MANAGEMENT_H
 #define ROOM_MANAGEMENT_H
 
+//arrays for clients
 typedef struct Client {
     int socket;
     char username[100];
-    struct Client* next;
+    // struct Client* next;
 } Client;
 
+// LL for rooms
 typedef struct Room {
     int id;
     char name[100] , passcode[100];
     Client* clients;
-    // int client_count;
-    // int client_capacity;
+    int client_count;
+    int client_capacity;
     struct Room* next;
 } Room;
 
