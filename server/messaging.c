@@ -4,50 +4,43 @@
 #include <winsock2.h>
 #include "roomManagement.h"
 #include "messaging.h"
+
 #define BUFFER_SIZE 1024
 
-
-void broadcastMessage(int sender_socket , int room_id , const char* message) {
+void broadcastMessage(int sender_socket, int room_id, const char* message) {
     Room* room = getRoomById(room_id);
-    if(room == NULL) {
-        printf("Room not found/ \n");
+    if (room == NULL) {
+        printf("Room not found.\n");
         return;
     }
 
-    for(int i = 0; i < room->client_count; ++i) {
-        int client_socket = room->clients[i];
+    for (int i = 0; i < room->client_count; ++i) {
+        int client_socket = room->clients[i].socket; // access the socket through the client struct
 
-        if(client_socket != sender_socket) {
-            send(client_socket , message , strnlen(message) , 0);
+        if (client_socket != sender_socket) {
+            send(client_socket, message, strnlen(message, BUFFER_SIZE), 0);
         }
     }
 }
 
-
-void handleMessage(int client_socket , int room_id) {
+void handleMessage(int client_socket, int room_id) {
     char buffer[BUFFER_SIZE];
-    int bytes_recieved;
+    int bytes_received;
 
-    while(1) {
-        memset(buffer , 0 , BUFFER_SIZE); // clear the buffer
+    while (1) {
+        memset(buffer, 0, BUFFER_SIZE); // clear
 
-        bytes_recieved = recv(client_socket , buffer , BUFFER_SIZE , 0);
+        bytes_received = recv(client_socket, buffer, BUFFER_SIZE, 0);
 
-        if(bytes_recieved <= 0) {
-            printf("Client disconnected or error occured. \n");
-            removeClientFromRoom(room_id , client_socket);
+        if (bytes_received <= 0) {
+            printf("Client disconnected or error occurred.\n");
+            removeUserFromRoom(room_id, client_socket); 
             closesocket(client_socket);
             break;
         }
-        buffer[bytes_recieved] = '\0';
-        printf("Recieved message from client in room %d: %s\n" , room_id , buffer);
+        buffer[bytes_received] = '\0';
+        printf("Received message from client in room %d: %s\n", room_id, buffer);
 
-        broadcastMessage(client_socket , room_id , buffer);
+        broadcastMessage(client_socket, room_id, buffer);
     }
 }
-
-
-
-
-
-
