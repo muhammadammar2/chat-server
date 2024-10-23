@@ -5,7 +5,7 @@
 typedef struct Client {
     int socket;
     char username[100];
-    // struct Client* next;
+    struct Client* next;
 } Client;
 
 // LL for rooms

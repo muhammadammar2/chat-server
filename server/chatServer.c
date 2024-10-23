@@ -3,6 +3,7 @@
 #include <string.h>
 #include <winsock2.h>
 #include <ws2tcpip.h> // for `sockaddr_in`
+#include "roomManagement.h"
 
 // link with Ws2_32.lib
 #pragma comment(lib, "Ws2_32.lib")
@@ -12,7 +13,7 @@
 
 void runServer(int server_socket);
 void handleClient(int client_socket);
-void cleanupClients(int* clients , int count);
+// void cleanupClients(int* clients , int count);
 
 int main() {
     struct sockaddr_in server_addr;   
@@ -62,4 +63,60 @@ void runServer(int server_socket) {
 
     cleanupSocket(clients , client_count);
     free(clients);
+}
+
+
+void handleClientMessage(int client_socket, const char* message) {
+    char command[256];
+    scanf(message, "%s", command); 
+
+    if (strcmp(command, "Join") == 0) {
+        // handle join room
+        char room_name[100], passcode[100];
+        scanf(message + strlen(command) + 1, "%s %s", room_name, passcode);
+        int room_id = JoinOrCreateRoom(room_name, passcode);
+        send(client_socket, (room_id >= 0) ? "Joined room successfully.\n" : "Failed to join room.\n", strlen("Joined room successfully.\n"), 0);
+    } else if (strcmp(command, "SEND") == 0) {
+        // handle send message
+        int room_id;
+        char msg[200];
+        scanf(message + strlen(command) + 1, "%d %[^\n]", &room_id, msg);
+        broadcastMessage(client_socket, room_id, msg);
+    } else if (strcmp(command, "KICK") == 0) {
+        // handle kick user (admin only)
+        if (!isAdmin(client_socket)) {
+            send(client_socket, "You do not have permission to kick users.\n", strlen("You do not have permission to kick users.\n"), 0);
+            return;
+        }
+
+        int room_id;
+        char username[100];
+        scanf(message + strlen(command) + 1, "%d %s", &room_id, username);
+        kickUserFromRoom(room_id, username);
+    } else if (strcmp(command, "LEAVE") == 0) {
+        // handle leave room
+        int room_id;
+        scanf(message + strlen(command) + 1, "%d", &room_id);
+        removeUserFromRoom(room_id, client_socket);
+    } else if (strcmp(command, "LIST") == 0) {
+        // handle list users
+        int room_id;
+        scanf(message + strlen(command) + 1, "%d", &room_id);
+        Room* room = getRoomById(room_id);
+        if (room == NULL) {
+            send(client_socket, "Room not found.\n", strlen("Room not found.\n"), 0);
+            return;
+        }
+
+        // user list response
+        char response[1024];
+        strcpy(response, "Users in room:\n");
+        for (int i = 0; i < room->client_count; ++i) {
+            strcat(response, room->clients[i].username); 
+            strcat(response, "\n");
+        }
+        send(client_socket, response, strlen(response), 0);
+    } else {
+        send(client_socket, "Unknown command.\n", strlen("Unknown command.\n"), 0);
+    }
 }
