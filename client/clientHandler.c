@@ -3,6 +3,8 @@
 #include <string.h>
 #include <winsock2.h>
 
+#include "../headers/chatServer.h"
+
 #include "../headers/clientHandler.h"
 
 #include "../headers/socketUtils.h"
