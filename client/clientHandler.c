@@ -54,7 +54,7 @@ void handleClient(int client_socket) {
         buffer[bytes_recieved] = '\0';
         printf("%s: %s\n" , username , buffer);
 
-        broadcastMessage(room_id , username , buffer);
+        broadcastMessage(client_socket , room_id , buffer);
     }
 
     cleanupClient(client_socket);

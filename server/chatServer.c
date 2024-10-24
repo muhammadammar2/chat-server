@@ -34,6 +34,7 @@ int main() {
 
     printf("Server listening on Port %d ... \n", PORT);
 
+
     while (1) {
         struct sockaddr_in client_addr;
         int client_socket = acceptConnections(server_socket, &client_addr);
