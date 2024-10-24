@@ -3,7 +3,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h> // For `sockaddr_in`
 
-#include "socketUtils.h"
+#include "../headers/socketUtils.h"
 
 // link with Ws2_32.lib
 #pragma comment(lib, "Ws2_32.lib")
