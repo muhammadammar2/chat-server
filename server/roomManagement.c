@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "roomManagement.h"
+
+#include <stdbool.h>
+#include "../headers/roomManagement.h"
+
+#include "../headers/chatServer.h"
 
 
 static Room* rooms = NULL;
@@ -38,28 +42,32 @@ int JoinOrCreateRoom(const char* room_name , const char* passcode) {
 
 }
 
-void addUserToRoom(int room_id , int client_socket , const char* username) {
+void addUserToRoom(int room_id, int client_socket, const char* username) {
     Room* room = rooms;
 
-    //find it by roomID
-    while(room != NULL) {
-        if(room->id == room_id) {
-            // resizing if necessary
+    while (room != NULL) {
+        if (room->id == room_id) {
+            // resize the clients array if necessary
             room->clients = (Client*)realloc(room->clients, (room->client_count + 1) * sizeof(Client));
+            if (room->clients == NULL) {
+                perror("Failed to reallocate memory for clients");
+                return; // exit if realloc fails
+            }
 
-            // create a new client
-            Client* new_client = (Client*) malloc(sizeof(Client));
-              Client* new_client = &room->clients[room->client_count++];
-              new_client->socket = client_socket;
-              strcpy(new_client->username, username);
+            // new client entry
+            Client* new_client = &room->clients[room->client_count++];
+            new_client->socket = client_socket;
+            strncpy(new_client->username, username, sizeof(new_client->username) - 1);
+            new_client->username[sizeof(new_client->username) - 1] = '\0'; 
 
-            printf("Added user %s to room %s\n" , username , room->name);
+            printf("Added user %s to room %s\n", username, room->name);
             return;
         }
         room = room->next;
     }
-    printf("Room Id %d not found\n" , room_id);
+    printf("Room ID %d not found\n", room_id);
 }
+
 
 
 void removeUserFromRoom(int room_id, int client_socket) {
@@ -155,4 +163,38 @@ void deleteRoom(int room_id) {
         current = &(*current)->next;
     }
     printf("Room ID %d not found\n", room_id);
+}
+
+
+
+int findSocketByUsername(int room_id, const char* username) {
+    Room* room = getRoomById(room_id);
+    if (room == NULL) return -1; //room not founds
+
+    for (int i = 0; i < room->client_count; i++) {
+        if (strcmp(room->clients[i].username, username) == 0) {
+            return room->clients[i].socket; // return the socket of the target user
+        }
+    }
+    return -1; // user not found
+}
+
+
+Room* getRoomById(int room_id) {
+    Room* room = rooms; 
+    while (room != NULL) {
+        if (room->id == room_id) {
+            return room; 
+        }
+        room = room->next;
+    }
+    return NULL; 
+}
+
+
+int admin_socket;
+
+bool isAdmin(int client_socket) {
+    //if the client is an admin
+    return (client_socket == admin_socket); //example
 }

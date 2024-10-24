@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <winsock2.h>
-#include "roomManagement.h"
-#include "messaging.h"
+
+#include "../headers/roomManagement.h"
+
+#include "../headers/messaging.h"
 
 #define BUFFER_SIZE 1024
 
