@@ -7,4 +7,6 @@ void handleClient(int client_socket);
 
 void cleanupClient(int client_socket);
 
+void handleInput (int socket);
+
 #endif 

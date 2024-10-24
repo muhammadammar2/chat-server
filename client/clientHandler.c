@@ -4,13 +4,22 @@
 #include <winsock2.h>
 
 #include "../headers/clientHandler.h"
+
 #include "../headers/socketUtils.h"
+
+#include "../headers/roomManagement.h" 
+
+#include "../headers/messaging.h"
+
+#define SERVER_IP "127.0.0.1" 
+
+#define PORT 8080
 
 void handleInput (int socket) {
     char command [256];
 
     while (1) {
-        printf("Start typing: ");
+        printf("Start typing: ");   
         fgets(command , sizeof(command) , stdin);
         command[strcspn(command, "\n")] = 0;
 
@@ -26,7 +35,7 @@ void handleClient(int client_socket) {
     recv(client_socket, room_name, sizeof(room_name), 0);
     recv(client_socket, passcode, sizeof(passcode), 0);
 
-    int room_id = joinOrCreateRoom(room_name, passcode);
+    int room_id = JoinOrCreateRoom(room_name, passcode);
     if (room_id == -1) {
         closesocket(client_socket);
         return; 
@@ -45,7 +54,7 @@ void handleClient(int client_socket) {
         buffer[bytes_recieved] = '\0';
         printf("%s: %s\n" , username , buffer);
 
-        broadcastMessage(room_id , buffer);
+        broadcastMessage(room_id , username , buffer);
     }
 
     cleanupClient(client_socket);

@@ -33,6 +33,15 @@ int main() {
     listenForConnections(server_socket);
 
     printf("Server listening on Port %d ... \n", PORT);
+
+    while (1) {
+        struct sockaddr_in client_addr;
+        int client_socket = acceptConnections(server_socket, &client_addr);
+        if (client_socket != (int)INVALID_SOCKET) {
+            printf("Client connected.\n");
+            handleClient(client_socket);
+        }
+    }
     
     runServer(server_socket);
 
