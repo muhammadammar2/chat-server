@@ -17,17 +17,47 @@
 
 #define PORT 8080
 
-void handleInput (int socket) {
-    char command [256];
+// void handleInput (int socket) {
+//     char command [256];
+
+//     while (1) {
+//         printf("Start typing: ");   
+//         fgets(command , sizeof(command) , stdin);
+//         command[strcspn(command, "\n")] = 0;
+
+//         send(socket , command , strlen(command) , 0);
+//     }
+// }
+
+void handleInput(int socket) {
+    char command[256];
+
+    printf("Hey there, welcome!\n");
+    printf("Do you want to create a room or join an existing one?\n");
+    printf("Type 'CREATE <room_name> <passcode>' to create a room\n");
+    printf("Type 'JOIN <room_name> <passcode>' to join a room\n");
+    printf("Type 'EXIT' to disconnect from the server.\n");
 
     while (1) {
-        printf("Start typing: ");   
-        fgets(command , sizeof(command) , stdin);
+        printf("Enter command: ");
+        fgets(command, sizeof(command), stdin);
+
         command[strcspn(command, "\n")] = 0;
 
-        send(socket , command , strlen(command) , 0);
+        if (strlen(command) == 0) {
+            continue; 
+        }
+
+        int bytes_sent = send(socket, command, strlen(command), 0);
+        if (bytes_sent == SOCKET_ERROR) {
+            perror("Failed to send command");
+            break; 
+        }
+
     }
 }
+
+
 
 void handleClient(int client_socket) {
     char buffer[1024] , username[100] ,room_name[100] , passcode[100];
