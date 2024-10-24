@@ -6,7 +6,7 @@
 #include "../headers/socketUtils.h"
 
 // link with Ws2_32.lib
-#pragma comment(lib, "Ws2_32.lib")
+// #pragma comment(lib, "Ws2_32.lib")
 
 
 int createSocket() {
@@ -18,7 +18,7 @@ int createSocket() {
     }
    // create tcp socket
     int server_socket = socket(AF_INET , SOCK_STREAM , 0);
-    if(server_socket == INVALID_SOCKET) {
+    if(server_socket == (int)INVALID_SOCKET) {
         printf("Socket creation failed: %d\n" , WSAGetLastError());
         WSACleanup();
         exit(EXIT_FAILURE);
@@ -52,9 +52,9 @@ void listenForConnections(int server_socket) {
 }
 
 int acceptConnections (int server_socket , struct sockaddr_in *client_addr) {
-    int client_addr_ln = sizeof(*client_addr);
-    int client_socket = accept(server_socket , (struct sockaddr*)client_addr , &client_addr_ln);
-    if(client_socket == INVALID_SOCKET) {
+    int client_addr_len = sizeof(*client_addr);
+    int client_socket = accept(server_socket , (struct sockaddr*)client_addr , &client_addr_len);
+    if(client_socket == (int)INVALID_SOCKET) {
         printf("Accept failed: %d\n" , WSAGetLastError());
     }
     return client_socket;

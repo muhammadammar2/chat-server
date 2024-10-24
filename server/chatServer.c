@@ -12,7 +12,7 @@
 
 #include "../headers/messaging.h"
 // link with Ws2_32.lib
-#pragma comment(lib, "Ws2_32.lib")
+// #pragma comment(lib, "Ws2_32.lib")
 
 #define PORT 8080         
 #define MAX_CLIENTS 100
@@ -27,7 +27,9 @@ int main() {
 
     // actually creating socket using utility functions
     server_socket = createSocket();
+
     bindSocket(server_socket, PORT);
+
     listenForConnections(server_socket);
 
     printf("Server listening on Port %d ... \n", PORT);

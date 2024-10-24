@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <winsock2.h>
-#include "clientHandler.h"
-#include "socketUtils.h"
 
+#include "../headers/clientHandler.h"
+#include "../headers/socketUtils.h"
 
 void handleInput (int socket) {
     char command [256];
