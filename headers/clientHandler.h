@@ -3,7 +3,6 @@
 
 #include <winsock2.h>
 
-
 #include "../headers/messaging.h"
 #include "../headers/roomManagement.h"
 
