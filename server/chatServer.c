@@ -16,20 +16,41 @@ void handleClient(int client_socket);
 // void cleanupClients(int* clients , int count);
 
 int main() {
-    struct sockaddr_in server_addr;   
-    int server_socket;
+    struct sockaddr_in server_addr;
+    int server_socket, client_socket;
+    struct sockaddr_in client_addr;
+    socklen_t client_addr_len = sizeof(client_addr);
 
-    //actually creating socket using utility funcs
+    // actually creating socket using utility functions
     server_socket = createSocket();
-    bindSocket(server_socket , PORT);
+    bindSocket(server_socket, PORT);
     listenForConnections(server_socket);
 
-    printf("Server listening on Port %d ... \n" , PORT);
+    printf("Server listening on Port %d ... \n", PORT);
     runServer(server_socket);
+    while (1) {
+        // accept a new client
+        client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_len);
+        if (client_socket < 0) {
+            printf("Failed to accept client connection.\n");
+            continue;
+        }
+        
+        printf("Client connected.\n");
+
+        //recieve the messages now
+        char buffer[256];
+        int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
+        if (bytes_received > 0) {
+            buffer[bytes_received] = '\0';  // null-terminate the received message
+            handleClientMessage(client_socket,client_socket, buffer);  // handle the client's message
+        }
+    }
 
     cleanupSocket(server_socket);
     return 0;
 }
+
 
 
 void runServer(int server_socket) {
@@ -66,7 +87,7 @@ void runServer(int server_socket) {
 }
 
 
-void handleClientMessage(int client_socket, const char* message) {
+void handleClientMessage(int client_socket, int admin_socket , const char* message) {
     char command[256];
     scanf(message, "%s", command); 
 
@@ -92,10 +113,10 @@ void handleClientMessage(int client_socket, const char* message) {
         int room_id;
         char username[100];
         scanf(message + strlen(command) + 1, "%d %s", &room_id, username);
-        kickUserFromRoom(room_id, username);
+        kickUserFromRoom(room_id ,admin_socket, username);
     } else if (strcmp(command, "LEAVE") == 0) {
         // handle leave room
-        int room_id;
+        int room_id;    
         scanf(message + strlen(command) + 1, "%d", &room_id);
         removeUserFromRoom(room_id, client_socket);
     } else if (strcmp(command, "LIST") == 0) {
