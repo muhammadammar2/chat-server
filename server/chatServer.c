@@ -21,7 +21,8 @@
 // void cleanupClients(int* clients , int count);
 
 
-int main() {
+int main (void) {
+
     struct sockaddr_in server_addr;
     int server_socket;
 
@@ -55,7 +56,7 @@ int main() {
 void runServer(int server_socket) {
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
-    int client_socket;
+    int client_socket;  
 
     int* clients = malloc(sizeof(int) * MAX_CLIENTS);
     int client_count = 0;
